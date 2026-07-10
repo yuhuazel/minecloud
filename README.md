@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="./minecloud.png" alt="MineCloud Logo" width="180">
+
 # MineCloud
 ### Secure Google Drive-Based Minecraft Server Cloud Management Platform
 

@@ -128,27 +128,6 @@ Designed for server owners who want a lightweight alternative to expensive hosti
 
 ---
 
-# 📂 Project Structure
-
-```
-MineCloud/
-│
-├── master_manager.py          # Administrator Console
-├── mc_manager.py              # Minecraft Client Console
-│
-├── client_access.key
-├── config.json
-├── session.json
-├── token.json
-│
-├── world_backup.zip
-├── sync_version.dat
-│
-└── README.md
-```
-
----
-
 # 🖥 Screens
 
 ## Master Manager
@@ -259,38 +238,6 @@ No backend credentials are exposed to end users.
 
 ---
 
-# 📦 Installation
-
-## Clone the repository
-
-```bash
-git clone https://github.com/yourusername/MineCloud.git
-
-cd MineCloud
-```
-
----
-
-## Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-or
-
-```bash
-pip install customtkinter
-
-pip install google-api-python-client
-
-pip install google-auth
-
-pip install google-auth-oauthlib
-
-pip install cryptography
-```
-
 ---
 
 # 🔧 Google Cloud Setup
@@ -318,24 +265,6 @@ client_secret.json
 - OAuth Client Secret
 
 7. Initialize Infrastructure
-
----
-
-# 🚀 Running
-
-## Administrator
-
-```bash
-python master_manager.py
-```
-
----
-
-## Client
-
-```bash
-python mc_manager.py
-```
 
 ---
 

@@ -240,10 +240,7 @@ No backend credentials are exposed to end users.
 
 3. **Configure the OAuth consent screen**  
    - Go to **APIs & Services > OAuth consent screen**.  
-   - Choose **External** user type and click **Create**.  
-   - Fill in the required fields (app name, user support email, developer contact email).  
-   - On the **Scopes** page, add the following scope:  
-     `https://www.googleapis.com/auth/drive`  
+   - Choose **External** user type and click **Create**.
    - On the **Test users** page, add **your own email address** (the admin account).  
    - Save and continue.  
    - **Publish the app**: After saving, go back to the OAuth consent screen, click **Publish App** under **Publishing status**. This moves the app to "In production" and allows any Google user to authenticate without you having to manually add their emails – they will see an unverified app warning, but can still proceed.

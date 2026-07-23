@@ -14,7 +14,6 @@
   <img src="https://img.shields.io/badge/Google%20Drive-API-4285F4?style=for-the-badge&logo=google-drive&logoColor=white">
   <img src="https://img.shields.io/badge/Fernet-Encryption-009688?style=for-the-badge">
   <img src="https://img.shields.io/badge/Platform-Windows-blue?style=for-the-badge">
-  <img src="https://img.shields.io/badge/License-MIT-success?style=for-the-badge">
 </p>
 
 ---

@@ -197,7 +197,7 @@ No backend credentials are ever exposed to end users.
    - Choose **External** user type and click **Create**.  
    - Fill in the required fields (App name, user support email, developer contact).  
    - On the **Test users** page, add **your own email address** (the admin account). Click **Save and Continue**.  
-   - After saving, go back to the OAuth consent screen and click **Publish App** under **Publishing status**. This moves the app to "In production". End users will see an unverified app warning, but can proceed without any manual email additions by the admin in google cloud console.
+   - After saving, go back to the OAuth consent screen and click **Publish App** under **Publishing status**. This moves the app to "In production". End users will see an unverified app warning, but can proceed without any manual email additions by the admin in the Google Cloud Console.
 
 4. **Create OAuth 2.0 Client ID**  
    - Go to **APIs & Services > Credentials**.  
@@ -206,10 +206,33 @@ No backend credentials are ever exposed to end users.
    - Name it (e.g., "MineCloud").  
    - Click **Create** and download the resulting `client_secret.json` file.  
 
-5. **Locate your Google Drive folder IDs**  
-   - Create two folders in your Google Drive: one for the **Backend** (configuration files) and one for the **Server** (world backups).  
-   - Open each folder in your browser; the folder ID is the long string in the URL: `https://drive.google.com/drive/folders/<FOLDER_ID>`.  
-   - Copy both IDs.
+5. **Create your Google Drive folder structure**  
+   - In your Google Drive, create a main folder for your server – for example, **`Minecraft Server`**.  
+   - Inside it, create two subfolders:  
+     - **`Backend`** – will store the encrypted backend files (accounts, tokens, settings).  
+     - **`World`** – will hold the world backup (`world_backup.zip`).  
+   - **Crucial:** Right‑click the **`Backend`** folder, select **Share > General access**, and change it to **Anyone with the link** and **Editor**. This allows clients to interact with the backend files securely.  
+   - Open each subfolder in your browser and copy its ID from the URL: `https://drive.google.com/drive/folders/<FOLDER_ID>`. You will need both IDs during Master Manager setup.
+
+---
+
+# 📦 Prepare Your World Backup
+
+Before the Master Manager can synchronize anything, you need an initial world backup to upload.
+
+1. **Create your Minecraft server world** – this can be any version (Vanilla, Forge, Fabric, etc.) and any modpack. Set up all the files, mods, and configuration exactly how you want them.
+
+2. **Place all server files** in a single folder. Make sure the folder contains everything needed to run the server (executable `.bat` or `.jar`, `server.properties`, `mods/`, `world/`, etc.).
+
+3. **Zip the folder correctly** – this step is critical:  
+   - Select **all the files and folders inside** your server folder (not the folder itself).  
+   - Right‑click and choose **Send to > Compressed (zipped) folder**.  
+   - Rename the zip file to **`world_backup.zip`**.  
+   - When you open the zip, you should see the server files directly (e.g., `server.jar`, `start.bat`, `world/`, `mods/`) **without** an extra wrapper folder.
+
+4. **Upload the zip** – manually upload `world_backup.zip` to the **`World`** folder you created in Google Drive. This will be the initial backup that all clients download.
+
+The Master Manager will then manage updates, revisions, and distribution automatically.
 
 ---
 
@@ -217,12 +240,12 @@ No backend credentials are ever exposed to end users.
 
 1. **Run `master_manager.py`**  
    Launch the application. On the Setup tab, fill in:
-   - **Backend Folder ID** – the ID of the folder where encrypted backend files will be stored.
-   - **Server Folder ID** – the ID of the folder where the world backup will be placed.
-   - **OAuth Secret JSON** – browse and select the `client_secret.json` file you downloaded.
+   - **Backend Folder ID** – the ID of the **`Backend`** folder you created.
+   - **Server Folder ID** – the ID of the **`World`** folder (where `world_backup.zip` lives).
+   - **OAuth Secret JSON** – browse and select the `client_secret.json` file you downloaded earlier.
 
 2. **Click Initialize Infrastructure**  
-   The app will open your browser for Google authentication. Sign in with the account that **owns** the Backend folder (you verified ownership during setup). If another account is used, you'll see an error and can click **Reauthenticate Account** to try again.
+   The app will open your browser for Google authentication. Sign in with the account that **owns** the Backend folder (ownership was verified during setup). If another account is used, you'll see an error and can click **Reauthenticate Account** to try again.
 
 3. **Successful connection**  
    A green "Connected" badge appears. The app automatically:

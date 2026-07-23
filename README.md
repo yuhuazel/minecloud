@@ -186,8 +186,6 @@ No backend credentials are ever exposed to end users.
 
 # 🔧 Google Cloud Setup (Required for Master)
 
-> **Important:** You do **not** need to add any scopes or enable additional APIs beyond the Google Drive API. Only the steps below are required.
-
 1. **Create a Google Cloud Project**  
    Go to [Google Cloud Console](https://console.cloud.google.com/), create a new project (or use an existing one).
 
@@ -198,9 +196,8 @@ No backend credentials are ever exposed to end users.
    - Go to **APIs & Services > OAuth consent screen**.  
    - Choose **External** user type and click **Create**.  
    - Fill in the required fields (App name, user support email, developer contact).  
-   - On the **Scopes** page, you can skip adding any scopes – MineCloud uses only the Drive API, which is automatically granted by the OAuth flow. Click **Save and Continue**.  
    - On the **Test users** page, add **your own email address** (the admin account). Click **Save and Continue**.  
-   - After saving, go back to the OAuth consent screen and click **Publish App** under **Publishing status**. This moves the app to "In production". End users will see an unverified app warning, but can proceed without any manual email additions.
+   - After saving, go back to the OAuth consent screen and click **Publish App** under **Publishing status**. This moves the app to "In production". End users will see an unverified app warning, but can proceed without any manual email additions by the admin in google cloud console.
 
 4. **Create OAuth 2.0 Client ID**  
    - Go to **APIs & Services > Credentials**.  

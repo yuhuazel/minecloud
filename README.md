@@ -412,32 +412,11 @@ The **Master Manager** can also create a portable encrypted backup of the entire
 
 ---
 
-# 🛣 Roadmap
-
-- [ ] Automatic scheduled backups
-- [ ] Real‑time synchronization
-- [ ] Discord integration
-- [ ] Multi‑server support
-- [ ] Plugin management
-- [ ] Server statistics dashboard
-- [ ] Automatic update checker
-- [ ] Web administration panel
-- [ ] Linux support
-- [ ] Docker deployment
-
----
-
 # 🤝 Contributing
 
 Contributions, suggestions, and feature requests are welcome.
 
 Feel free to open an Issue or submit a Pull Request.
-
----
-
-# 📄 License
-
-This project is licensed under the MIT License.
 
 ---
 

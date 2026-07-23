@@ -31,68 +31,75 @@ Designed for server owners who want a lightweight alternative to expensive hosti
 
 ## 🔒 Security
 
-- AES‑grade Fernet encryption
-- Encrypted backend database
-- Secure Google OAuth authentication
-- SHA‑256 password hashing
-- One‑time activation strings (no permanent tokens)
-- Admin ownership verification (Google Drive folder owner)
-- User approval system
-- Encrypted local vault
-- Cloud permission management
-- Audit logging
+- AES‑grade Fernet encryption for all sensitive cloud files
+- Encrypted backend database (accounts, tokens, settings)
+- Secure Google OAuth authentication (no static API keys)
+- SHA‑256 password hashing for user accounts
+- One‑time activation strings (consumed immediately, never reusable)
+- Admin ownership verification (must be the Drive folder owner)
+- User approval workflow (pending → approved)
+- Encrypted local vault tied to the machine (salt + key derivation)
+- Cloud permission management via Google Drive API
+- Audit logging for every administrative action
 
 ---
 
 ## ☁️ Cloud Infrastructure
 
-- Google Drive integration
-- Automatic cloud synchronization
-- Incremental world backups
-- Backup verification
-- Backup rollback via Drive revisions
-- Cloud revision history
-- Automatic upload/download
-- Version tracking (MD5‑based integrity)
+- Google Drive integration (Backend & Server folders)
+- Automatic cloud synchronization (download & upload)
+- Incremental world backups via Drive revisions
+- Backup integrity verification (MD5 checksums)
+- Backup rollback (restore any previous revision)
+- Cloud revision history browser
+- Version tracking with local `sync_version.dat` files
+- Smart‑sync: avoids redundant downloads when world is up‑to‑date
 
 ---
 
 ## 👥 User Management
 
-- Activation‑based registration
-- Auto‑approval in public mode
-- Manual approval in restricted mode
-- Login with Remember Me
-- Reauthenticate Account (email mismatch)
-- Bulk approve / revoke
-- User search and sorting
-- Email‑based permissions
+- Activation‑based registration (no permanent invitation tokens)
+- Auto‑approval in **Public** mode, manual approval in **Restricted** mode
+- Login with optional **Remember Me** (session saved in encrypted vault)
+- **Reauthenticate Account** button on email mismatch
+- Bulk approve / revoke with checkboxes
+- User search and sorting (by name, date, status)
+- Email‑based Google Drive permissions
 
 ---
 
-## 🎮 Minecraft Management
+## 🎮 Minecraft Management (Client)
 
-- Launch / Stop server
-- Auto‑detect .bat / .jar executables
-- Configurable RAM settings (for .bat files)
+- Launch & stop server with one click
+- Auto‑detect `.bat` and `.jar` executables in world folder
+- **Optional RAM configuration** for `.bat` files (displayed clearly as default or custom)
 - Live server console with command input
-- Server state monitoring
-- Automatic cloud sync (upload)
-- Parallel HTTP download for fast world retrieval
-- Server location modes: Automatic (AppData) or Manual (custom folder)
+- Server state monitoring (online / stopped)
+- Parallel HTTP download using Range requests for fast world retrieval
+- **Automatic mode**: world stored in `%APPDATA%\MineCloud\server`
+- **Manual mode**: choose any folder for the world, set executable manually
+- Smooth transfer of world files when switching between modes
+- Clear world with confirmation and console reset
+- `.jar` servers run with `java -jar`, ensuring console output and proper stop
 
 ---
 
-## ⚙️ Administration
+## ⚙️ Administration (Master Manager)
 
-- Infrastructure setup wizard
-- Folder permission manager (Public / Restricted)
-- Automatic permission migration between modes
-- One‑time activation string generation
-- Backend reset (repair)
-- Configuration backup & restore (includes OAuth secret)
-- Audit history
-- Revision rollback
+- Infrastructure setup wizard (Backend/Server folder IDs, OAuth secret)
+- Google Drive authentication with ownership verification
+- One‑time activation string generation (base64‑encoded payload)
+- Activation strings management (view, copy, clear all)
+- User management with compact cards, search, sort, refresh
+- Bulk approve / reject pending users
+- Folder permission manager (Public / Restricted toggle)
+- Automatic permission sync after initialization
+- Rollback manager: view revision timeline, restore any previous backup
+- Delete backup file (removes all revisions)
+- Configuration backup & import (portable, encrypted, embeds OAuth secret)
+- Backend repair & reset (rebuilds encrypted files)
+- Logout from Setup tab (mutually exclusive with Reauthenticate button)
 
 ---
 
@@ -129,43 +136,14 @@ Designed for server owners who want a lightweight alternative to expensive hosti
 
 ---
 
-# 🖥 Screens
-
-## Master Manager
-
-✔ Infrastructure Setup (Backend/Server folders, OAuth secret)  
-✔ Google Drive Authentication (with ownership check)  
-✔ Activation String Generation  
-✔ User Management (search, approve, reject, revoke)  
-✔ Folder Permissions (Public / Restricted toggle)  
-✔ Rollback Manager (restore previous world backups)  
-✔ Configuration Backup & Import (portable, encrypted)  
-✔ Backend Repair & Reset  
-✔ Logout & Reauthenticate
-
----
-
-## Client Console
-
-✔ One‑time Activation (paste string)  
-✔ Registration (username, email, password)  
-✔ Login with Remember Me  
-✔ Server Control (launch, stop, console)  
-✔ Cloud Sync (download / upload world)  
-✔ Server Location: Auto or Manual mode  
-✔ RAM Configuration (for .bat files)  
-✔ Reauthenticate Account (on email mismatch)
-
----
-
 # 🔑 Backend Files
 
 All backend files are encrypted using Fernet encryption (except `audit_log.json` and `access_config.enc`, which is encrypted with a separate activation key).
 
 | File | Purpose |
 |------|----------|
-| accounts.json | Registered users (username, email, status) |
-| tokens.json | List of unused activation strings |
+| accounts.json | Registered users (username, email, hashed password, status) |
+| tokens.json | List of unused activation strings (each consumed upon use) |
 | folder_settings.json | Permission mode (`public` or `restricted`) |
 | audit_log.json | Administrative logs (plain JSON) |
 | access_config.enc | Bootstrap payload for clients (activation‑key encrypted) |
@@ -176,90 +154,133 @@ All backend files are encrypted using Fernet encryption (except `audit_log.json`
 
 MineCloud uses a layered security model.
 
-- Google OAuth Authentication
-- Fernet Encryption (AES‑CBC + HMAC)
+- Google OAuth Authentication (Desktop application flow)
+- Fernet Encryption (AES‑CBC + HMAC) for all sensitive cloud files
 - SHA‑256 Password Hashing
-- One‑time Activation Strings (single‑use, removed immediately)
-- Admin Ownership Verification (Drive folder owner check)
+- One‑time Activation Strings (deleted from cloud immediately after use)
+- Admin Ownership Verification (ensures only the Drive folder owner can initialize)
 - User Approval Workflow
-- Google Drive Permission API
-- Encrypted Local Vault (machine‑specific key)
-- Audit Logging
-- Portable Backup Encryption (fixed application key)
+- Google Drive Permission API (individual user permissions)
+- Encrypted Local Vault (key derived from machine‑specific salt + hardcoded seed)
+- Audit Logging (every admin action is recorded)
+- Portable Backup Encryption (fixed application key for cross‑machine restore)
 
-No backend credentials are exposed to end users.
+No backend credentials are ever exposed to end users.
 
 ---
 
 # ⚡ Technologies Used
 
-## Language
-
-- Python 3
-
----
-
-## GUI
-
-- CustomTkinter
-
----
-
-## Google APIs
-
-- Google Drive API
-- OAuth2
+| Component | Technology |
+|-----------|------------|
+| Language | Python 3.11+ |
+| GUI | CustomTkinter |
+| Google APIs | Google Drive API v3, OAuth2 |
+| Cryptography | cryptography (Fernet), hashlib (SHA‑256) |
+| Networking | requests, socket, ssl |
+| Concurrency | threading, concurrent.futures |
+| Compression | zipfile |
+| System | subprocess, os, io, time, shutil, ctypes |
 
 ---
 
-## Cryptography
+# 🔧 Google Cloud Setup (Required for Master)
 
-- cryptography
-- Fernet Encryption
+> **Important:** You do **not** need to add any scopes or enable additional APIs beyond the Google Drive API. Only the steps below are required.
 
----
+1. **Create a Google Cloud Project**  
+   Go to [Google Cloud Console](https://console.cloud.google.com/), create a new project (or use an existing one).
 
-## Standard Libraries
-
-- json
-- hashlib
-- threading
-- subprocess
-- zipfile
-- os
-- io
-- time
-
----
-
-# 🔧 Google Cloud Setup
-
-1. **Create a Google Cloud Project** – Go to the [Google Cloud Console](https://console.cloud.google.com/), create a new project (or use an existing one).
-
-2. **Enable the Google Drive API** – In the project, navigate to **APIs & Services > Library**, search for "Google Drive API", and enable it.
+2. **Enable the Google Drive API**  
+   Navigate to **APIs & Services > Library**, search for "Google Drive API", and enable it.
 
 3. **Configure the OAuth consent screen**  
    - Go to **APIs & Services > OAuth consent screen**.  
-   - Choose **External** user type and click **Create**.
-   - On the **Test users** page, add **your own email address** (the admin account).  
-   - Save and continue.  
-   - **Publish the app**: After saving, go back to the OAuth consent screen, click **Publish App** under **Publishing status**. This moves the app to "In production" and allows any Google user to authenticate without you having to manually add their emails – they will see an unverified app warning, but can still proceed.
+   - Choose **External** user type and click **Create**.  
+   - Fill in the required fields (App name, user support email, developer contact).  
+   - On the **Scopes** page, you can skip adding any scopes – MineCloud uses only the Drive API, which is automatically granted by the OAuth flow. Click **Save and Continue**.  
+   - On the **Test users** page, add **your own email address** (the admin account). Click **Save and Continue**.  
+   - After saving, go back to the OAuth consent screen and click **Publish App** under **Publishing status**. This moves the app to "In production". End users will see an unverified app warning, but can proceed without any manual email additions.
 
 4. **Create OAuth 2.0 Client ID**  
    - Go to **APIs & Services > Credentials**.  
    - Click **Create Credentials > OAuth client ID**.  
    - Choose **Desktop app** as the application type.  
-   - Name it (e.g., "MineCloud Master").  
+   - Name it (e.g., "MineCloud").  
    - Click **Create** and download the resulting `client_secret.json` file.  
 
-5. **Open the Master Manager** and fill in the following:
-   - **Backend Folder ID** – the ID of the Google Drive folder that will store the encrypted configuration files.
-   - **Server Folder ID** – the ID of the Google Drive folder where the world backup (`world_backup.zip`) will be stored.
+5. **Locate your Google Drive folder IDs**  
+   - Create two folders in your Google Drive: one for the **Backend** (configuration files) and one for the **Server** (world backups).  
+   - Open each folder in your browser; the folder ID is the long string in the URL: `https://drive.google.com/drive/folders/<FOLDER_ID>`.  
+   - Copy both IDs.
+
+---
+
+# 🖥 Master Manager Setup
+
+1. **Run `master_manager.py`**  
+   Launch the application. On the Setup tab, fill in:
+   - **Backend Folder ID** – the ID of the folder where encrypted backend files will be stored.
+   - **Server Folder ID** – the ID of the folder where the world backup will be placed.
    - **OAuth Secret JSON** – browse and select the `client_secret.json` file you downloaded.
 
-6. Click **Initialize Infrastructure**. The app will authenticate you via Google, verify that your account is the owner of the Backend folder, and complete the setup.
+2. **Click Initialize Infrastructure**  
+   The app will open your browser for Google authentication. Sign in with the account that **owns** the Backend folder (you verified ownership during setup). If another account is used, you'll see an error and can click **Reauthenticate Account** to try again.
 
-> **Note:** For the **Client Console**, each end user will need to authenticate with their own Google account when they activate the software. Because the OAuth app is in production, they only need to accept the unverified app warning – no manual email additions are required.
+3. **Successful connection**  
+   A green "Connected" badge appears. The app automatically:
+   - Makes the Backend folder publicly writable (so clients can interact via shared links).
+   - Syncs the actual Server folder permission mode with `folder_settings.json`.
+   - Creates or verifies the encrypted backend files.
+   - Re‑uploads `access_config.enc` (the bootstrap file for clients).
+
+4. **Generate activation strings**  
+   Switch to the **Activation** tab and click **Generate New Activation String**. Copy the string and give it to a client.
+
+5. **Manage users**  
+   In the **Users** tab you can search, filter, approve, reject, or revoke users. Use **Refresh** to reload the list.
+
+6. **Folder permissions**  
+   Under **Folder Permissions**, you can toggle between **Public** (auto‑approve new users) and **Restricted** (manual approval). When switching to Restricted, all approved users are automatically added as editors to the Server folder.
+
+7. **Rollback & maintenance**  
+   Use the Rollback tab to view and restore previous world backups. The Settings tab lets you back up your configuration (including the OAuth secret), import a backup, clear all local data, or repair the backend.
+
+---
+
+# 💻 Client Console Setup
+
+1. **Get an activation string** from your admin.  
+2. **Run `mc_manager.py`** – the activation screen appears. Paste the string and click **Activate**.  
+   The client will:
+   - Decode the string, download `access_config.enc`, decrypt it, and obtain the encryption keys and folder IDs.
+   - Authenticate with Google (you will be prompted in your browser).
+   - Remove the used activation string from the cloud.
+
+3. **Register or Sign In**  
+   - If you're a new user, click the **Register** tab. Enter a username, your Google email, and a password.  
+   - If the server is in **Public** mode, your account is immediately approved and you're logged in.  
+   - In **Restricted** mode, your account is created as **pending** and you must wait for admin approval.  
+   - To log in, use your username or email and password. If you accidentally use the wrong Google account, a **Reauthenticate Account** button appears – click it to switch.
+
+4. **First‑time download**  
+   - The first time you launch the client, you'll be asked to choose **Automatic** or **Manual** world storage.  
+   - **Automatic**: the world is stored in `%APPDATA%\MineCloud\server`. Everything is handled automatically.  
+   - **Manual**: you choose a folder on your PC. You'll need to set the **Server Directory** and later the **Server Executable** manually.
+
+5. **Using the dashboard**  
+   - **Download World / Start Server** button: downloads the latest world backup if you don't have it, or starts the server if it's up‑to‑date.  
+   - **Sync to Cloud**: after stopping the server, click to upload your world.  
+   - **Console**: send commands directly to the server (e.g., `say Hello`).  
+   - **Clear World**: deletes the local world and resets the configuration (executable path, RAM settings).  
+   - **Clear Credentials**: erases all local activation data – you'll need a new activation string.  
+   - **Server Location**: switch between Automatic and Manual modes. If a world exists, you'll be prompted to move it.  
+   - **Edit RAM** (automatic mode, `.bat` only): change the minimum and maximum RAM for the server. The default values from the `.bat` are shown in the configuration card as `[Default RAM]`.
+
+6. **RAM information**  
+   In **Manual** mode, after selecting a `.bat` executable, the Server Configuration card shows either `[Default RAM]: Minimum Allocated RAM: XGB | Maximum Allocated RAM: XGB` (if you haven't customised it) or your custom values. In **Automatic** mode, the same info appears below the server status.
+
+7. **Logout** clears your session and Google token – the next user will start fresh.
 
 ---
 
@@ -346,10 +367,10 @@ The **Master Manager** can also create a portable encrypted backup of the entire
 
 ---
 
-# 📈 Current Features
+# 📈 Current Features (Summary)
 
-- ✅ Google Drive Cloud Storage
-- ✅ Automatic World Backup & Sync
+- ✅ Google Drive Cloud Storage with encryption
+- ✅ Automatic World Backup & Smart Sync
 - ✅ One‑time Activation Strings
 - ✅ User Authentication & Registration
 - ✅ Permission Management (Public/Restricted)
@@ -357,13 +378,17 @@ The **Master Manager** can also create a portable encrypted backup of the entire
 - ✅ Backup Rollback (Revision History)
 - ✅ Live Server Console
 - ✅ Server Launcher with Executable Detection
-- ✅ RAM Configuration for .bat Servers
+- ✅ Optional RAM Configuration for .bat Servers (clear Default/Custom display)
+- ✅ Auto/Manual Server Location Modes with seamless world transfer
 - ✅ Session Management & Remember Me
 - ✅ Encrypted Backend & Local Vault
 - ✅ Admin Ownership Verification
 - ✅ Portable Configuration Backup & Import
 - ✅ Parallel Fast Download
-- ✅ Auto/Manual Server Location Modes
+- ✅ Clear World with full state reset
+- ✅ .jar server support (console output & proper stop)
+- ✅ Utility buttons blocked during server run
+- ✅ Reauthenticate Account on email mismatch
 
 ---
 
